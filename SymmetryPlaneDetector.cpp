@@ -577,6 +577,28 @@ TopoDS_Shape SymmetryPlaneDetector::DetectBestPlaneShape(
     return TopoDS_Shape();
 }
 
+std::vector<TopoDS_Shape> SymmetryPlaneDetector::DetectPlaneShapes(
+    const TopoDS_Shape& inputShape,
+    const SymmetryDetectionOptions& options)
+{
+    // 输入：TopoDS_Shape
+    // 输出：所有可接受的 TopoDS_Shape 平面；失败时返回空 vector。
+    const std::vector<SymmetryPlaneShapeResult> results = Detect(inputShape, options);
+
+    std::vector<TopoDS_Shape> planeShapes;
+
+    for (const SymmetryPlaneShapeResult& result : results)
+    {
+        if (result.quality == SymmetryQuality::Strict ||
+            result.quality == SymmetryQuality::Approximate)
+        {
+            planeShapes.push_back(result.planeShape);
+        }
+    }
+
+    return planeShapes;
+}
+
 TopoDS_Shape FindSymmetryPlaneShape(const TopoDS_Shape& inputShape)
 {
     // 简化接口。
@@ -584,4 +606,13 @@ TopoDS_Shape FindSymmetryPlaneShape(const TopoDS_Shape& inputShape)
     // 输出：最优对称平面 Face；未找到时返回空 Shape。
     SymmetryDetectionOptions options;
     return SymmetryPlaneDetector::DetectBestPlaneShape(inputShape, options);
+}
+
+std::vector<TopoDS_Shape> FindSymmetryPlaneShapes(const TopoDS_Shape& inputShape)
+{
+    // 简化接口。
+    // 输入：任意 TopoDS_Shape。
+    // 输出：所有可接受的对称平面 Face；未找到时返回空 vector。
+    SymmetryDetectionOptions options;
+    return SymmetryPlaneDetector::DetectPlaneShapes(inputShape, options);
 }

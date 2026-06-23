@@ -12,10 +12,14 @@
  *     - 调用方不需要额外告诉算法模型类型。
  *
  * 输出：
- *   TopoDS_Shape planeShape
- *     - 表示检测到的对称平面的有限矩形面片。
- *     - 实际类型通常是 TopoDS_Face，但以 TopoDS_Shape 返回。
+ *   std::vector<TopoDS_Shape> planeShapes
+ *     - 表示检测到的一个或多个对称平面的有限矩形面片。
+ *     - 每个元素实际类型通常是 TopoDS_Face，但以 TopoDS_Shape 返回。
  *     - 注意：数学平面是无限大的，TopoDS_Shape 必须是有限几何，因此这里输出的是足够大的平面 Face。
+ *
+ *   兼容接口：
+ *     - FindSymmetryPlaneShape(...) 返回最优的一个对称平面。
+ *     - FindSymmetryPlaneShapes(...) 返回所有可接受的对称平面。
  *
  * 依赖：
  *   Open CASCADE Technology，简称 OCCT。
@@ -166,6 +170,22 @@ public:
     static TopoDS_Shape DetectBestPlaneShape(
         const TopoDS_Shape& inputShape,
         const SymmetryDetectionOptions& options = SymmetryDetectionOptions());
+
+    /**
+     * 输入：
+     *   inputShape: 需要检测对称面的 OCCT 形体。
+     *   options: 检测参数。
+     *
+     * 输出：
+     *   std::vector<TopoDS_Shape>
+     *     - 所有可接受的对称平面 Face。
+     *     - 包含 Strict 和 Approximate 两类结果。
+     *     - 已按 normalizedError 从小到大排序。
+     *     - 如果没有找到可接受的对称面，则返回空 vector。
+     */
+    static std::vector<TopoDS_Shape> DetectPlaneShapes(
+        const TopoDS_Shape& inputShape,
+        const SymmetryDetectionOptions& options = SymmetryDetectionOptions());
 };
 
 /**
@@ -178,3 +198,16 @@ public:
  *   TopoDS_Shape: 最优对称平面 Face；未找到时返回空 Shape。
  */
 TopoDS_Shape FindSymmetryPlaneShape(const TopoDS_Shape& inputShape);
+
+/**
+ * 简化接口：返回多个对称平面。
+ *
+ * 输入：
+ *   inputShape: 任意 TopoDS_Shape。
+ *
+ * 输出：
+ *   std::vector<TopoDS_Shape>
+ *     - 所有可接受的对称平面 Face。
+ *     - 如果没有找到，则返回空 vector。
+ */
+std::vector<TopoDS_Shape> FindSymmetryPlaneShapes(const TopoDS_Shape& inputShape);
