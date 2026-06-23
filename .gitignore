@@ -1,0 +1,28 @@
+# Build outputs
+*.obj
+*.exe
+*.lib
+*.dll
+*.pdb
+*.ilk
+*.exp
+Debug/
+Release/
+x64/
+x86/
+.vs/
+
+# IDE
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.vcxproj.*.user
+*.vcxproj.filters
+*.vcxproj.FileListAbsolute.txt
+
+# Temp
+*.tmp
+*.log
+*.tlog
+ipch/
