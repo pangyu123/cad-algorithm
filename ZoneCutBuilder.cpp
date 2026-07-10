@@ -161,7 +161,7 @@ void ZoneCutBuilder::Build()
 					offsetCurves.push_back(offsetCurve);
 				}
 
-				offsetCurves = ConnectOffsetCurves(chain.face, offsetCurves);
+				offsetCurves = ConnectOffsetCurves(chain.face, offsetCurves, chain.closed);
 
 				if (myExtendToBoundary)
 				{
@@ -642,7 +642,8 @@ ZoneCutBuilder::BuildOffsetCurveOnFace(
 std::vector<ZoneCutBuilder::OffsetCurveOnFace>
 ZoneCutBuilder::ConnectOffsetCurves(
 	const TopoDS_Face& face,
-	const std::vector<OffsetCurveOnFace>& inputCurves) const
+	const std::vector<OffsetCurveOnFace>& inputCurves,
+	bool closed) const
 {
 	if (inputCurves.size() <= 1)
 	{
@@ -699,8 +700,6 @@ ZoneCutBuilder::ConnectOffsetCurves(
 		}
 
 		// Solve: endA + s * tanEndA = startB - t * tanStartB
-		//        s * tanEndA.X + t * tanStartB.X = startB.X - endA.X
-		//        s * tanEndA.Y + t * tanStartB.Y = startB.Y - endA.Y
 		const double dx = startB.X() - endA.X();
 		const double dy = startB.Y() - endA.Y();
 
@@ -718,6 +717,56 @@ ZoneCutBuilder::ConnectOffsetCurves(
 		conn.point.SetY(endA.Y() + std::max(0.0, s) * tanEndA.Y());
 
 		connections[i] = conn;
+	}
+
+	// For closed chains: compute wrap-around connection (last -> first)
+	Connection wrapConnection;
+
+	if (closed)
+	{
+		const OffsetCurveOnFace& lastCurve = inputCurves[n - 1];
+		const OffsetCurveOnFace& firstCurve = inputCurves[0];
+
+		gp_Pnt2d endLast = CurvePoint2d(lastCurve.curve2d, lastCurve.last);
+		gp_Pnt2d startFirst = CurvePoint2d(firstCurve.curve2d, firstCurve.first);
+
+		if (Distance2d(endLast, startFirst) > gapTol)
+		{
+			gp_Pnt2d dummy;
+			gp_Vec2d tanEndLast;
+			gp_Vec2d tanStartFirst;
+
+			lastCurve.curve2d->D1(lastCurve.last, dummy, tanEndLast);
+			firstCurve.curve2d->D1(firstCurve.first, dummy, tanStartFirst);
+
+			if (tanEndLast.SquareMagnitude() > Precision::SquareConfusion()
+				&& tanStartFirst.SquareMagnitude() > Precision::SquareConfusion())
+			{
+				tanEndLast.Normalize();
+				tanStartFirst.Normalize();
+
+				const double cross = tanEndLast.X() * tanStartFirst.Y()
+					- tanEndLast.Y() * tanStartFirst.X();
+
+				if (std::abs(cross) >= 1.0e-10)
+				{
+					const double dx = startFirst.X() - endLast.X();
+					const double dy = startFirst.Y() - endLast.Y();
+
+					const double s = (dx * tanStartFirst.Y() - dy * tanStartFirst.X()) / cross;
+					const double t = (tanEndLast.X() * dy - tanEndLast.Y() * dx) / cross;
+
+					if (s >= -gapTol && t >= -gapTol)
+					{
+						wrapConnection.valid = true;
+						wrapConnection.point.SetX(
+							endLast.X() + std::max(0.0, s) * tanEndLast.X());
+						wrapConnection.point.SetY(
+							endLast.Y() + std::max(0.0, s) * tanEndLast.Y());
+					}
+				}
+			}
+		}
 	}
 
 	// Phase 2: extend / trim curves to intersection points
@@ -738,6 +787,18 @@ ZoneCutBuilder::ConnectOffsetCurves(
 		if (i > 0 && connections[i - 1].valid)
 		{
 			curve = ExtendCurveToPoint(curve, connections[i - 1].point, false);
+		}
+
+		// closed wrap: last curve end -> wrap point
+		if (closed && wrapConnection.valid && i == n - 1)
+		{
+			curve = ExtendCurveToPoint(curve, wrapConnection.point, true);
+		}
+
+		// closed wrap: first curve start -> wrap point
+		if (closed && wrapConnection.valid && i == 0)
+		{
+			curve = ExtendCurveToPoint(curve, wrapConnection.point, false);
 		}
 
 		output.push_back(curve);

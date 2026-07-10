@@ -99,7 +99,8 @@ private:
 
 	std::vector<OffsetCurveOnFace> ConnectOffsetCurves(
 		const TopoDS_Face& face,
-		const std::vector<OffsetCurveOnFace>& inputCurves) const;
+		const std::vector<OffsetCurveOnFace>& inputCurves,
+		bool closed) const;
 
 	std::vector<OffsetCurveOnFace> ExtendChainToBoundary(
 		const TopoDS_Face& face,
