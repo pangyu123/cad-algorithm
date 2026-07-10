@@ -823,7 +823,7 @@ ZoneCutBuilder::ExtendChainToBoundary(
 		return inputCurves;
 	}
 
-	std::vector<OffsetCurveOnFace> output = inputCurves;
+	std::vector<OffsetCurveOnFace> output;
 
 	const OffsetCurveOnFace& firstCurve = inputCurves.front();
 	const OffsetCurveOnFace& lastCurve = inputCurves.back();
@@ -856,9 +856,22 @@ ZoneCutBuilder::ExtendChainToBoundary(
 
 		if (Distance2d(startBoundaryPoint, startPoint) > Precision::Confusion())
 		{
-			output.front() = ExtendCurveToPoint(
-				output.front(), startBoundaryPoint, false);
+			Handle(Geom2d_Curve) seg =
+				GCE2d_MakeSegment(startBoundaryPoint, startPoint).Value();
+
+			OffsetCurveOnFace ext;
+			ext.face = face;
+			ext.curve2d = seg;
+			ext.first = seg->FirstParameter();
+			ext.last = seg->LastParameter();
+
+			output.push_back(ext);
 		}
+	}
+
+	for (const OffsetCurveOnFace& oc : inputCurves)
+	{
+		output.push_back(oc);
 	}
 
 	if (hasEndExtension)
@@ -870,8 +883,16 @@ ZoneCutBuilder::ExtendChainToBoundary(
 
 		if (Distance2d(endPoint, endBoundaryPoint) > Precision::Confusion())
 		{
-			output.back() = ExtendCurveToPoint(
-				output.back(), endBoundaryPoint, true);
+			Handle(Geom2d_Curve) seg =
+				GCE2d_MakeSegment(endPoint, endBoundaryPoint).Value();
+
+			OffsetCurveOnFace ext;
+			ext.face = face;
+			ext.curve2d = seg;
+			ext.first = seg->FirstParameter();
+			ext.last = seg->LastParameter();
+
+			output.push_back(ext);
 		}
 	}
 
