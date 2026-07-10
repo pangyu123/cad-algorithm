@@ -1,0 +1,24 @@
+# Build outputs
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln
+*.vcxproj*
+
+# CMake
+build/
+cmake-build-*/
+
+# OS
+.DS_Store
+Thumbs.db
