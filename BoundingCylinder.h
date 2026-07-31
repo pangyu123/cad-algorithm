@@ -983,11 +983,98 @@ inline Result Compute(
     }
 
     // -------------------------------------------------------------------
-    //  6. 构造圆柱实体
+    //  6. 防守型校验：确保所有几何参数有效
     // -------------------------------------------------------------------
+    const auto IsFinitePnt = [](const gp_Pnt& p) -> bool
+    {
+        return std::isfinite(p.X()) && std::isfinite(p.Y()) && std::isfinite(p.Z());
+    };
+
+    if (!IsFinitePnt(best.baseCenter))
+    {
+        throw std::runtime_error(
+            "BoundingCylinder: baseCenter contains NaN or Inf.");
+    }
+
+    if (!IsFinitePnt(best.center))
+    {
+        throw std::runtime_error(
+            "BoundingCylinder: center contains NaN or Inf.");
+    }
+
+    if (!std::isfinite(best.radius))
+    {
+        throw std::runtime_error(
+            "BoundingCylinder: radius is not finite (NaN or Inf).");
+    }
+
+    if (!std::isfinite(best.height))
+    {
+        throw std::runtime_error(
+            "BoundingCylinder: height is not finite (NaN or Inf).");
+    }
+
+    if (best.radius <= Precision::Confusion())
+    {
+        throw std::runtime_error(
+            "BoundingCylinder: radius is too small (<= Precision::Confusion). "
+            "Consider increasing minimumRadius in Options.");
+    }
+
+    if (best.height <= Precision::Confusion())
+    {
+        throw std::runtime_error(
+            "BoundingCylinder: height is too small (<= Precision::Confusion). "
+            "Consider increasing minimumHeight in Options.");
+    }
+
+    const double axisMag = gp_Vec(best.axis).Magnitude();
+
+    if (axisMag < Precision::Confusion())
+    {
+        throw std::runtime_error(
+            "BoundingCylinder: axis direction is degenerate (zero vector).");
+    }
+
+    // -------------------------------------------------------------------
+    //  7. 构造圆柱实体
+    //
+    //  关键：使用 gp_Ax2 三参数构造函数，显式提供垂直于轴方向的
+    //  XDirection，而非依赖两参数构造函数的自动计算。
+    //
+    //  两参数 gp_Ax2(P, D) 内部用 (1,0,0) 或 (0,0,1) 做参考方向
+    //  来推导 XDirection。当轴方向恰好与参考方向平行时，自动计算
+    //  会产生非确定性结果，极少数情况下可能导致 BRepPrim_Cylinder
+    //  内部母线构造失败。
+    // -------------------------------------------------------------------
+    gp_Vec axisVec(best.axis);
+
+    // 选取一个不平行于轴方向的参考方向
+    gp_Vec refVec;
+
+    if (std::abs(best.axis.Dot(gp_Dir(1.0, 0.0, 0.0))) < 0.9999)
+    {
+        refVec = gp_Vec(1.0, 0.0, 0.0);
+    }
+    else
+    {
+        refVec = gp_Vec(0.0, 1.0, 0.0);
+    }
+
+    // XDirection = axis × (ref × axis) → 保证垂直于 axis
+    gp_Vec xDir = axisVec.Crossed(refVec);
+
+    if (xDir.SquareMagnitude() < Precision::SquareConfusion())
+    {
+        throw std::runtime_error(
+            "BoundingCylinder: failed to compute perpendicular XDirection "
+            "for cylinder coordinate system.");
+    }
+
     const gp_Ax2 cylinderAxes(
         best.baseCenter,
-        best.axis);
+        best.axis,
+        gp_Dir(xDir));
 
     BRepPrimAPI_MakeCylinder cylinderMaker(
         cylinderAxes,
@@ -997,11 +1084,12 @@ inline Result Compute(
     if (!cylinderMaker.IsDone())
     {
         throw std::runtime_error(
-            "BoundingCylinder: BRepPrimAPI_MakeCylinder failed.");
+            "BoundingCylinder: BRepPrimAPI_MakeCylinder::IsDone() "
+            "returned false — internal revolution algorithm failed.");
     }
 
     // -------------------------------------------------------------------
-    //  7. 返回结果
+    //  8. 返回结果
     // -------------------------------------------------------------------
     Result result;
     result.cylinder = cylinderMaker.Shape();
