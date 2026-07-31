@@ -1,0 +1,22 @@
+TopoDS_Shape inputShape = ...;
+
+BoundingCylinderOptions options;
+
+// 圆柱比 OBB 径向多留 0.5 mm。
+options.radialClearance = 0.5;
+
+// 圆柱上下两端各多留 0.5 mm。
+options.axialClearance = 0.5;
+
+// 使用 OBB 最长轴作为圆柱中心轴。
+options.axisPolicy =
+    BoundingCylinderAxisPolicy::LongestObbAxis;
+
+BoundingCylinderResult result =
+    MakeBoundingCylinder(inputShape, options);
+
+TopoDS_Shape cylinderShape = result.cylinder;
+
+std::cout << "Radius: " << result.radius << '\n';
+std::cout << "Height: " << result.height << '\n';
+std::cout << "OBB axis index: " << result.obbAxisIndex << '\n';
