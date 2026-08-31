@@ -1,0 +1,7 @@
+face_id,persistent_id,predicted_label,expected_label,expected_chain,expected_feature,expected_feature_kind,expected_radius_behavior,notes
+1,face-776e6cd4f5a36b65,FILLET,FILLET,ring-chain,ring-feature,closed-loop,constant,BSpline torus quarter
+2,face-b6c69bfc4e9e32ca,FILLET,FILLET,ring-chain,ring-feature,closed-loop,constant,BSpline torus quarter
+3,face-bc528488015762e0,FILLET,FILLET,ring-chain,ring-feature,closed-loop,constant,BSpline torus quarter
+4,face-5e17378cf1787925,FILLET,FILLET,ring-chain,ring-feature,closed-loop,constant,BSpline torus quarter
+5,face-3580641077ccff0f,NOT_FILLET,NOT_FILLET,,,,,outer cylindrical support
+6,face-b2377eced2571b4f,NOT_FILLET,NOT_FILLET,,,,,inner cylindrical support

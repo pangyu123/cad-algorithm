@@ -1,0 +1,41 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "windows-debug",
+      "displayName": "Windows Debug (OCCT 7.8.1)",
+      "generator": "Visual Studio 16 2019",
+      "architecture": "x64",
+      "binaryDir": "D:/workspace/cad-algorithm-build/debug",
+      "cacheVariables": {
+        "OpenCASCADE_DIR": "D:/workspace/cad-algorithm-deps/occt-7.8.1/cmake",
+        "BUILD_TESTING": "ON"
+      }
+    },
+    {
+      "name": "windows-release",
+      "inherits": "windows-debug",
+      "displayName": "Windows Release (OCCT 7.8.1)",
+      "binaryDir": "D:/workspace/cad-algorithm-build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_TESTING": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "debug", "configurePreset": "windows-debug", "configuration": "Debug" },
+    { "name": "release", "configurePreset": "windows-release", "configuration": "Release" }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "windows-debug",
+      "configuration": "Debug",
+      "environment": {
+        "PATH": "D:/workspace/cad-algorithm-deps/occt-7.8.1/win64/vc14/bind;$penv{PATH}"
+      },
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+face_id,persistent_id,predicted_label,expected_label,expected_chain,expected_feature,expected_feature_kind,expected_radius_behavior,notes
+1,face-235d3102276b78e7,NOT_FILLET,NOT_FILLET,,,,,box support face
+2,face-61ef56a5cb54c3b4,NOT_FILLET,NOT_FILLET,,,,,box support face
+3,face-df37e02eee9cb055,FILLET,FILLET,variable-chain,variable-feature,isolated-patch,smooth-variable-candidate,OCCT generated radius law 3 to 8
+4,face-e473c3d0868d97ef,NOT_FILLET,NOT_FILLET,,,,,box support face
+5,face-61f0e72ff5cab455,NOT_FILLET,NOT_FILLET,,,,,box support face
+6,face-2c7e521ed86fb5b4,NOT_FILLET,NOT_FILLET,,,,,box support face
+7,face-820939c0dbb3d71f,NOT_FILLET,NOT_FILLET,,,,,box support face
