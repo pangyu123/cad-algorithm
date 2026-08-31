@@ -1,5 +1,25 @@
-/build/
-/vcpkg_installed/
-/.vs/
-*.user
+# Build outputs
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.lib
 
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln
+*.vcxproj*
+
+# CMake
+build/
+cmake-build-*/
+vcpkg_installed/
+
+# OS
+.DS_Store
+Thumbs.db

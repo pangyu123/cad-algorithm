@@ -1,0 +1,358 @@
+#pragma once
+
+#include <TopoDS_Shape.hxx>
+
+#include <Bnd_OBB.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
+
+#include <gp_Ax2.hxx>
+#include <gp_Dir.hxx>
+#include <gp_Pnt.hxx>
+#include <gp_Vec.hxx>
+
+#include <Precision.hxx>
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <limits>
+#include <stdexcept>
+
+
+enum class BoundingCylinderAxisPolicy
+{
+    // 使用 OBB 最长轴作为圆柱中心轴。
+    LongestObbAxis,
+
+    // 分别尝试 OBB 的 X/Y/Z 三个轴，
+    // 选择生成圆柱体积最小的一个。
+    MinimumVolumeAmongObbAxes
+};
+
+
+struct BoundingCylinderOptions
+{
+    BoundingCylinderAxisPolicy axisPolicy =
+        BoundingCylinderAxisPolicy::LongestObbAxis;
+
+    // 是否使用已有三角网格计算 OBB。
+    bool useTriangulation = true;
+
+    // true 会尝试计算更紧致的 OBB，但计算时间更长。
+    bool useOptimalObb = true;
+
+    // 将 Shape/三角网格容差考虑进 OBB。
+    bool useShapeTolerance = true;
+
+    // 圆柱半径方向额外扩展量。
+    double radialClearance = 0.0;
+
+    // 圆柱轴向两端分别额外扩展的距离。
+    double axialClearance = 0.0;
+
+    // 防止线、面等退化 Shape 生成零半径圆柱。
+    double minimumRadius = Precision::Confusion() * 10.0;
+
+    // 防止退化 Shape 生成零高度圆柱。
+    double minimumHeight = Precision::Confusion() * 10.0;
+};
+
+
+struct BoundingCylinderResult
+{
+    // 生成的包围圆柱实体。
+    TopoDS_Shape cylinder;
+
+    // 原始 Shape 的 OBB，方便调试和显示。
+    Bnd_OBB obb;
+
+    // OBB 中心，同时也是圆柱中心。
+    gp_Pnt center;
+
+    // 圆柱底面圆心。
+    gp_Pnt baseCenter;
+
+    // 圆柱中心轴方向。
+    gp_Dir axis;
+
+    double radius = 0.0;
+    double height = 0.0;
+
+    // 0 = OBB X 轴
+    // 1 = OBB Y 轴
+    // 2 = OBB Z 轴
+    int obbAxisIndex = -1;
+};
+
+
+namespace BoundingCylinderDetail
+{
+
+inline void ValidateOptions(const BoundingCylinderOptions& options)
+{
+    const auto isInvalidNonNegativeValue = [](double value)
+    {
+        return !std::isfinite(value) || value < 0.0;
+    };
+
+    if (isInvalidNonNegativeValue(options.radialClearance))
+    {
+        throw std::invalid_argument(
+            "radialClearance must be finite and non-negative.");
+    }
+
+    if (isInvalidNonNegativeValue(options.axialClearance))
+    {
+        throw std::invalid_argument(
+            "axialClearance must be finite and non-negative.");
+    }
+
+    if (!std::isfinite(options.minimumRadius) ||
+        options.minimumRadius <= 0.0)
+    {
+        throw std::invalid_argument(
+            "minimumRadius must be finite and positive.");
+    }
+
+    if (!std::isfinite(options.minimumHeight) ||
+        options.minimumHeight <= 0.0)
+    {
+        throw std::invalid_argument(
+            "minimumHeight must be finite and positive.");
+    }
+}
+
+
+inline double CylinderRadiusForAxis(
+    const std::array<double, 3>& halfSizes,
+    int axisIndex,
+    const BoundingCylinderOptions& options)
+{
+    const int transverseAxis1 = (axisIndex + 1) % 3;
+    const int transverseAxis2 = (axisIndex + 2) % 3;
+
+    // 圆柱需要包围垂直于中心轴的 OBB 矩形截面。
+    //
+    // 截面半边长分别为 a、b，
+    // 外接圆半径为 sqrt(a² + b²)。
+    const double rawRadius = std::hypot(
+        halfSizes[transverseAxis1],
+        halfSizes[transverseAxis2]);
+
+    return std::max(
+        rawRadius + options.radialClearance,
+        options.minimumRadius);
+}
+
+
+inline double CylinderHeightForAxis(
+    const std::array<double, 3>& halfSizes,
+    int axisIndex,
+    const BoundingCylinderOptions& options)
+{
+    const double rawHeight =
+        2.0 * (halfSizes[axisIndex] + options.axialClearance);
+
+    return std::max(rawHeight, options.minimumHeight);
+}
+
+
+inline int SelectLongestAxis(const std::array<double, 3>& halfSizes)
+{
+    const auto iter = std::max_element(
+        halfSizes.begin(),
+        halfSizes.end());
+
+    return static_cast<int>(
+        std::distance(halfSizes.begin(), iter));
+}
+
+
+inline int SelectMinimumVolumeAxis(
+    const std::array<double, 3>& halfSizes,
+    const BoundingCylinderOptions& options)
+{
+    int bestAxisIndex = 0;
+    double bestScore = std::numeric_limits<double>::max();
+
+    for (int axisIndex = 0; axisIndex < 3; ++axisIndex)
+    {
+        const double radius = CylinderRadiusForAxis(
+            halfSizes,
+            axisIndex,
+            options);
+
+        const double height = CylinderHeightForAxis(
+            halfSizes,
+            axisIndex,
+            options);
+
+        // π 对三个候选轴都相同，因此比较 r²h 即可。
+        const double score = radius * radius * height;
+
+        if (score < bestScore)
+        {
+            bestScore = score;
+            bestAxisIndex = axisIndex;
+        }
+    }
+
+    return bestAxisIndex;
+}
+
+
+inline int SelectAxis(
+    const std::array<double, 3>& halfSizes,
+    const BoundingCylinderOptions& options)
+{
+    switch (options.axisPolicy)
+    {
+    case BoundingCylinderAxisPolicy::LongestObbAxis:
+        return SelectLongestAxis(halfSizes);
+
+    case BoundingCylinderAxisPolicy::MinimumVolumeAmongObbAxes:
+        return SelectMinimumVolumeAxis(halfSizes, options);
+    }
+
+    throw std::runtime_error("Unsupported cylinder axis policy.");
+}
+
+} // namespace BoundingCylinderDetail
+
+
+inline BoundingCylinderResult MakeBoundingCylinder(
+    const TopoDS_Shape& shape,
+    const BoundingCylinderOptions& options = {})
+{
+    using namespace BoundingCylinderDetail;
+
+    if (shape.IsNull())
+    {
+        throw std::invalid_argument(
+            "Cannot build bounding cylinder from a null TopoDS_Shape.");
+    }
+
+    ValidateOptions(options);
+
+    /*
+     * 1. 计算 Shape 的 OBB。
+     *
+     * 参数含义：
+     * useTriangulation
+     * useOptimalObb
+     * useShapeTolerance
+     */
+    Bnd_OBB obb;
+
+    BRepBndLib::AddOBB(
+        shape,
+        obb,
+        options.useTriangulation,
+        options.useOptimalObb,
+        options.useShapeTolerance);
+
+    if (obb.IsVoid())
+    {
+        throw std::runtime_error(
+            "Failed to compute OBB for the input shape.");
+    }
+
+    /*
+     * Bnd_OBB 的 Center()/Direction() 返回 gp_XYZ，
+     * 转换为更便于使用的 gp_Pnt/gp_Dir。
+     */
+    const gp_Pnt center(obb.Center());
+
+    const std::array<gp_Dir, 3> directions = {
+        gp_Dir(obb.XDirection()),
+        gp_Dir(obb.YDirection()),
+        gp_Dir(obb.ZDirection())
+    };
+
+    const std::array<double, 3> halfSizes = {
+        obb.XHSize(),
+        obb.YHSize(),
+        obb.ZHSize()
+    };
+
+    /*
+     * 2. 选择圆柱中心轴。
+     */
+    const int axisIndex = SelectAxis(halfSizes, options);
+
+    const int transverseAxis1 = (axisIndex + 1) % 3;
+
+    const gp_Dir cylinderDirection = directions[axisIndex];
+
+    /*
+     * 3. 根据 OBB 尺寸计算包围圆柱。
+     *
+     * 假设中心轴是 OBB 的 i 轴：
+     *
+     * height = 2 * halfSize[i]
+     *
+     * radius = sqrt(
+     *     halfSize[j]^2 +
+     *     halfSize[k]^2)
+     *
+     * 该圆柱包围 OBB 的八个角点，因此也包围 OBB 本身。
+     */
+    const double radius = CylinderRadiusForAxis(
+        halfSizes,
+        axisIndex,
+        options);
+
+    const double height = CylinderHeightForAxis(
+        halfSizes,
+        axisIndex,
+        options);
+
+    /*
+     * 4. 将底面圆心放到：
+     *
+     * OBB中心 - 圆柱轴方向 * height / 2
+     *
+     * 这样圆柱关于 OBB 中心对称。
+     */
+    gp_Vec centerToBase(cylinderDirection);
+    centerToBase.Multiply(-0.5 * height);
+
+    const gp_Pnt baseCenter = center.Translated(centerToBase);
+
+    /*
+     * gp_Ax2 的主方向是圆柱 Z 轴。
+     *
+     * 使用 OBB 的一个横向轴作为 gp_Ax2 的 XDirection，
+     * 可以保持生成圆柱坐标系稳定。
+     */
+    const gp_Ax2 cylinderAxes(
+        baseCenter,
+        cylinderDirection,
+        directions[transverseAxis1]);
+
+    /*
+     * 5. 构造实体圆柱。
+     */
+    BRepPrimAPI_MakeCylinder cylinderMaker(
+        cylinderAxes,
+        radius,
+        height);
+
+    if (!cylinderMaker.IsDone())
+    {
+        throw std::runtime_error(
+            "BRepPrimAPI_MakeCylinder failed.");
+    }
+
+    return BoundingCylinderResult{
+        cylinderMaker.Shape(),
+        obb,
+        center,
+        baseCenter,
+        cylinderDirection,
+        radius,
+        height,
+        axisIndex
+    };
+}
