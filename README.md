@@ -2,6 +2,11 @@
 
 这是一个锁定到 Open CASCADE Technology 7.8.1 的 C++17/CMake 调试工程。算法基线直接编译并调用 `D:\workspace\cad-algorithm\识别圆角.cpp` 原源码；`FilletBaselineAdapter.cpp` 只负责工程接口和结果转换，不包含识别规则。`ImprovedFilletRecognizer` 在不修改基线的前提下逐项实现 `圆角识别改进.txt`。
 
+文档入口：
+
+- `圆角识别算法基线与28轮迭代记录.md`：环境、路径、逐轮效果、测试基线和后续接手流程；
+- `docs/28轮迭代技术详解.md`：28 轮技术原理的通俗解释，以及 TopologyRole/Feature 专题说明。
+
 - **圆角链路**：半径相容、通过公共边 G1 连续的候选面连通分量；
 - **链路属性**：边界边、切向支撑边、端部边、半径范围、闭合状态和分支状态。
 
