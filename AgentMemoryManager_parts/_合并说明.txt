@@ -1,0 +1,18 @@
+AgentMemoryManager 分卷压缩包 合并方法
+=====================================
+
+把全部 8 个分卷（AgentMemoryManager.zip.001 ~ .008）放到同一目录后合并：
+
+[Windows] PowerShell：
+  $names = Get-ChildItem -Name 'AgentMemoryManager.zip.*' | Sort-Object
+  $out = [System.IO.File]::OpenWrite("$PWD\AgentMemoryManager.zip")
+  foreach ($n in $names) { $b = [System.IO.File]::ReadAllBytes("$PWD\$n"); $out.Write($b,0,$b.Length) }
+  $out.Close()
+
+[Linux/Git Bash]：
+  cat AgentMemoryManager.zip.* > AgentMemoryManager.zip
+
+合并后用以下命令验证（应与 _SHA256.txt 中一致）：
+  sha256sum AgentMemoryManager.zip
+
+时间：2026-09-05 11:26:46
