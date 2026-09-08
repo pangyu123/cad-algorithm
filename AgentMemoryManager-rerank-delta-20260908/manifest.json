@@ -1,0 +1,264 @@
+{
+  "format": "AgentMemoryManager independent zip parts v1",
+  "profile": "rerank-delta",
+  "source_root": "D:\\workspace\\AgentMemoryManager",
+  "excluded": [
+    ".cache",
+    ".env",
+    ".git",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "AgentMemoryManager.zip",
+    "__pycache__"
+  ],
+  "files": [
+    {
+      "path": ".env.example",
+      "size": 1591,
+      "sha256": "d40d0306dc532c2ca4718740fd12a7a893c33034027acb7dc64fcf1651ebd0fa",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/__init__.py",
+      "size": 48,
+      "sha256": "7ed15ffacd77bdb6d260ae0bc690ef21fbb2add68c63dc00699cfc33fffb75d7",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/clients.py",
+      "size": 6988,
+      "sha256": "0097af369d4b0d4d558c5fb9205c71230ce088d9eb46f687ffaa3437e679c324",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/config.py",
+      "size": 5105,
+      "sha256": "19566d2779c0db2817e85e5b62a55e77fbae07305cfb70aff4025b52f49ed65e",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/database.py",
+      "size": 7038,
+      "sha256": "34f719ba629d5b7892bd64e0533573b2b44f224f78e0c39711a803669af229f0",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/evaluation_ui.html",
+      "size": 20904,
+      "sha256": "c3b3970384d888e995f3d6999633f52cfe94c1b95f575402a7821ab89590bbe4",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/extraction.py",
+      "size": 22830,
+      "sha256": "f64f445658190d960c51c819384314f12c0ea79fcdd28560c6b9c9b016b763fb",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/local_embeddings.py",
+      "size": 2669,
+      "sha256": "47139ccb0fa13379772a361243187b7579c37a1774b30fcca978e41abf3f413d",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/local_reranking.py",
+      "size": 2374,
+      "sha256": "d96e3ed14819ac01cfc16c27d262b618da405509b8da57e8efdc81bdad64d2a3",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/logging.py",
+      "size": 764,
+      "sha256": "dfc6024542d46f421982375b345010e7c3976c96a1d20b7920e6a53854081174",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/main.py",
+      "size": 5473,
+      "sha256": "287bc68ad654a0dab9dc9cacb2665abe04500a0b8c1227e411f22020aca9c587",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/memory_service.py",
+      "size": 58560,
+      "sha256": "eea39588f9233c3a6ead03bdccb6c70acfa2fdd180ca7e4d00e4ad35e6afbfc5",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/ranking.py",
+      "size": 4572,
+      "sha256": "d48bd33b8556a660a1f106b8cc662337dbcc7d8d6fc28d07ed59a917fad37145",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/reranking.py",
+      "size": 5317,
+      "sha256": "02173ea139b8129e35e3f47641e444b39caa3622c8db04093ad4e2c627e1314a",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/schemas.py",
+      "size": 7349,
+      "sha256": "80473e928dd7a6a4aa840e76bd1974a7a91fd820969589687466a69a547fc53a",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "app/test_ui.html",
+      "size": 15493,
+      "sha256": "422e23c944681bd660c13787b1b6eac6a26f0cbfd3de0a4e2aa9fd9d9b20d17f",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "Dockerfile",
+      "size": 621,
+      "sha256": "fc9a19970cb22e7f161468443de23198cb2dbb6fb424ebc96579b3e01cf0a561",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "models/mmarco-mMiniLMv2-L12-H384-v1/.gitattributes",
+      "size": 1227,
+      "sha256": "400b270bc8f5cb44fda65b1a4532ceca0fb452d0637425e861829560cf393ae2",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "models/mmarco-mMiniLMv2-L12-H384-v1/config.json",
+      "size": 891,
+      "sha256": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-001.zip"
+    },
+    {
+      "path": "models/mmarco-mMiniLMv2-L12-H384-v1/model.safetensors",
+      "size": 470592698,
+      "sha256": "5daeca2481a76b5976a2bdc32f0a78532b6716da4f8cd3ff59460ef8d2f359b4",
+      "chunks": [
+        {
+          "package": "AgentMemoryManager-rerank-delta-20260908-part-002.zip",
+          "entry": "__chunks__/000020/part-001",
+          "size": 73400320,
+          "sha256": "ae5ca016b86f4c3d0e02ae25d56814f1ab946dd4f1cc7fd8aae72c12d46e7b37"
+        },
+        {
+          "package": "AgentMemoryManager-rerank-delta-20260908-part-003.zip",
+          "entry": "__chunks__/000020/part-002",
+          "size": 73400320,
+          "sha256": "9c1f5aedba38c1d7c5e3bc589a75f83d71fd0d7ba1b7cf9b77d82a2192658f11"
+        },
+        {
+          "package": "AgentMemoryManager-rerank-delta-20260908-part-004.zip",
+          "entry": "__chunks__/000020/part-003",
+          "size": 73400320,
+          "sha256": "9086fd8e01f5439ceb1dd82ed3a560678ac02c42d04209332b5828e71ee9655e"
+        },
+        {
+          "package": "AgentMemoryManager-rerank-delta-20260908-part-005.zip",
+          "entry": "__chunks__/000020/part-004",
+          "size": 73400320,
+          "sha256": "8b875d80519a9e462efd0c3aa15339ca135cf7f886487904b8c3cbd88e043e8a"
+        },
+        {
+          "package": "AgentMemoryManager-rerank-delta-20260908-part-006.zip",
+          "entry": "__chunks__/000020/part-005",
+          "size": 73400320,
+          "sha256": "0c0c1b5ff957a818b227a288a0989011a08767f9b6d1d006b96cafbfb3425490"
+        },
+        {
+          "package": "AgentMemoryManager-rerank-delta-20260908-part-007.zip",
+          "entry": "__chunks__/000020/part-006",
+          "size": 73400320,
+          "sha256": "122f01042506ed9677046b510d828b39b75cf1087e2030140bb59677b3c8b905"
+        },
+        {
+          "package": "AgentMemoryManager-rerank-delta-20260908-part-008.zip",
+          "entry": "__chunks__/000020/part-007",
+          "size": 30190778,
+          "sha256": "53bbdec3dd61217c2cf448b7410433fd7021c24c43d64f98df864f36e3241411"
+        }
+      ]
+    },
+    {
+      "path": "models/mmarco-mMiniLMv2-L12-H384-v1/README.md",
+      "size": 2278,
+      "sha256": "474736a65d6393a060119a8dc304563af67af4d8d86ccfee4a05dd0df107fc11",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-008.zip"
+    },
+    {
+      "path": "models/mmarco-mMiniLMv2-L12-H384-v1/sentencepiece.bpe.model",
+      "size": 5069051,
+      "sha256": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-008.zip"
+    },
+    {
+      "path": "models/mmarco-mMiniLMv2-L12-H384-v1/special_tokens_map.json",
+      "size": 239,
+      "sha256": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-008.zip"
+    },
+    {
+      "path": "models/mmarco-mMiniLMv2-L12-H384-v1/tokenizer.json",
+      "size": 17082660,
+      "sha256": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-008.zip"
+    },
+    {
+      "path": "models/mmarco-mMiniLMv2-L12-H384-v1/tokenizer_config.json",
+      "size": 435,
+      "sha256": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-008.zip"
+    },
+    {
+      "path": "pyproject.toml",
+      "size": 1036,
+      "sha256": "092278268ac472acff4a7e90831f7458dacec5275407563b3abf60966fd6032e",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-008.zip"
+    },
+    {
+      "path": "README.md",
+      "size": 13813,
+      "sha256": "cd2b2b94dd4cb73ab33da4f47479d323a93a6fa1783a7b50605757ba73d09c86",
+      "package": "AgentMemoryManager-rerank-delta-20260908-part-008.zip"
+    }
+  ],
+  "packages": [
+    {
+      "name": "AgentMemoryManager-rerank-delta-20260908-part-001.zip",
+      "size": 52121,
+      "sha256": "9ef25746be2796b913413d29934eadc88f754fc1972f24cd63142cd8decfe772"
+    },
+    {
+      "name": "AgentMemoryManager-rerank-delta-20260908-part-002.zip",
+      "size": 73400470,
+      "sha256": "1f8a94c9e9bcf181f861b063c2d27f03ec08aa1c3ff7bb8df30d792184f22bb1"
+    },
+    {
+      "name": "AgentMemoryManager-rerank-delta-20260908-part-003.zip",
+      "size": 73400470,
+      "sha256": "2b50eddd81196c890bc1b6704ae2c749f91a92d9f7a969dbc2a559307a8fff58"
+    },
+    {
+      "name": "AgentMemoryManager-rerank-delta-20260908-part-004.zip",
+      "size": 73400470,
+      "sha256": "ad78fdcb53369dc8aedb88fdf1870c001f071ca8fc7d62064e453cf514fbb6f7"
+    },
+    {
+      "name": "AgentMemoryManager-rerank-delta-20260908-part-005.zip",
+      "size": 73400470,
+      "sha256": "dd62c784f6919226e416b33c21b9c6e7c3941819fa3d18b380fb8d91a0f73a01"
+    },
+    {
+      "name": "AgentMemoryManager-rerank-delta-20260908-part-006.zip",
+      "size": 73400470,
+      "sha256": "cff02ea880319ee01216f5c34557b29497b7a9357a454927b7ea6a0fcb516cec"
+    },
+    {
+      "name": "AgentMemoryManager-rerank-delta-20260908-part-007.zip",
+      "size": 73400470,
+      "sha256": "d31aea92a641f65c91d0ab32260de1a8957c85c7ec67312056b3ac10a152562e"
+    },
+    {
+      "name": "AgentMemoryManager-rerank-delta-20260908-part-008.zip",
+      "size": 36795880,
+      "sha256": "0af6d4b01a71caee653f6ff857a63b92d4fb35e31e90d368a9ed88e22937c705"
+    }
+  ]
+}
